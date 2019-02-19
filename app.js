@@ -11,28 +11,9 @@ class Book {
 // UI Class: Handle UI tasks
 class UI {
   static displayBooks(){
-    const storedBooks = [
+    const books = Store.getBooks();
   
-  {
-    title: 'Critique of Pure Reason',
-    author: 'Immanuel Kant',
-    isbn: '98678'
-  },
-  {
-    title: 'Phenomenology of Spirit',
-    author: 'Georg Wilhelm Friedrich Hegel',
-    isbn: '696969'
-  },
-  {
-    title: 'Thus Spoke Zarathustra',
-    author: 'Friedrich Nietzsche',
-    isbn: '123546'
-  }
- ];
-
-  const books = storedBooks;
-  
-  books.forEach((book) => UI.addBookToList(book));
+    books.forEach((book) => UI.addBookToList(book));
  }
  
  static addBookToList(book){
@@ -76,6 +57,35 @@ class UI {
     document.querySelector('#isbn').value = "";
   }
 }
+// Store Class: Handles Storage (local)
+class Store {
+  static getBooks(){
+    let books;
+    if(localStorage.getItem('books') === null){
+      books = [];
+  }  else{
+      books = JSON.parse(localStorage.getItem('books'));
+  }
+      return books;
+  }
+  static addBook(book){
+      const books = Store.getBooks();
+      books.push(book);
+      localStorage.setItem('books', JSON.stringify(books));
+
+}
+  static removeBook(isbn){
+    const books = Store.getBooks();
+    
+    books.forEach((book, index) => {
+         if (book.isbn === isbn){
+          books.splice(index, 1);
+     }
+  });
+    localStorage.setItem('books', JSON.stringify(books));
+  }
+}
+
 // Events: Display, Add Books
   document.addEventListener('DOMContentLoaded', UI.displayBooks);
   document.querySelector('#book-form').addEventListener('submit', (e) => {
@@ -97,6 +107,9 @@ class UI {
 
 // Add book to UI
   UI.addBookToList(book);
+    
+// Add book to storage
+    Store.addBook(book);
 
 // Show success alert
     UI.showAlert('Book Added', 'success');
@@ -106,42 +119,10 @@ class UI {
   }
 });
 // Remove Book
-document.querySelector('#book-list').addEventListener('click', (e) => {
+document.querySelector('#book-list').addEventListener('click', (e) => { 
   UI.deleteBook(e.target);
-// Show success alert
+  Store.removeBook(e.target.parentElement.previousElementSibling.textContent);
+
+  // Show success alert
     UI.showAlert('Book Removed', 'success');
-
 });
-
-
-
-
-// Store Class: Handles Storage (local)
-class Store {
-  static getBooks(){
-    let books;
-    if(localStorage.getItem('books') === null){
-      books = [];
-  }  else{
-      books = JSON.parse(localStorage.getItem('books'));
-  }
-      return books;
-  }
-  static addBook(book){
-      const books = Store.getBooks();
-    
-    books.push(book);
-    
-    localStorage.setItem('books', JSON.stringify(books));
-
-}
-  static removeBook(isbn){
-    const books = Store.getbooks();
-    
-    books.forEach((book, index) => {}
-         if (book.isbn === isbn){
-          books.splice(index, 1);
-     }
-  });
-    localStorage.setItem('books, JSON.stringify(books));
-}
